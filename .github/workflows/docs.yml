@@ -1,0 +1,64 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+# The build needs nothing beyond the source. Write access to the repository is
+# granted to the deploy job alone, below, so a pull request build -- which is
+# where third-party code resolved at build time gets to run -- cannot push to
+# gh-pages.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pip install -r requirements.txt
+      - run: mkdocs build --strict
+
+  deploy:
+    # Only main and tags publish. A pull request stops after the build above:
+    # it has proved the docs still build, and it has no business pushing to
+    # gh-pages.
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Never two deploys at once: mike pushes gh-pages and the second is
+    # rejected outright.
+    concurrency:
+      group: gh-pages-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Deploy dev (push to main)
+        if: startsWith(github.ref, 'refs/heads/')
+        run: |
+          mike deploy --push --update-aliases dev latest
+          mike set-default --push latest
+      - name: Deploy release (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mike deploy --push --update-aliases "${GITHUB_REF_NAME}" latest
+          mike set-default --push latest
