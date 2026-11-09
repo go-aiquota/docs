@@ -13,7 +13,11 @@ The scale has 8 equal steps of 12.5 % (`aiquota.bands` for fewer): light green, 
 
 ## Design {#design}
 
-VS Code extensions must be JavaScript, so the extension is a thin shell: it runs `aiquota status -o statusbar` and shows the one JSON object it prints (`items` with `text`, `band`, `color`, `background`, and a `tooltip`). Reading the credential, verdicts, thresholds, bands, colours and wording stay in the Go binary (`aiquota` v0.5.0 or newer; the extension asks for the contract it reads with `--format-version 2`, so a newer binary keeps working), tested there; whatever fails, the item reads `Claude ?` and never goes empty; no secret passes through the extension. One process at a time, killed on timeout; a 60 s interval (minimum 30 s) and a cooldown that also covers clicks keep the usage endpoint from being hammered.
+VS Code extensions must be JavaScript, so the extension is a thin shell: it runs `aiquota status -o statusbar --render 1` and draws exactly the items that description lists (per item `id`, `text`, `tooltip`, `color`, `background`, `priority`, `alignment`, `command`, plus a `detail` text and `poll_seconds`). Reading the credential, verdicts, thresholds, bands, colours, labels and the item list stay in the Go binary (`aiquota` v0.6.0 or newer; the extension keeps asking for render 1, so a newer binary keeps working), tested there; whatever fails, the item reads `Claude ?` and never goes empty; no secret passes through the extension. One process at a time, killed on timeout; a 60 s interval (minimum 30 s) and a cooldown that also covers clicks keep the usage endpoint from being hammered.
+
+## Changing the look: edit Go, go install, click {#tuning}
+
+The extension is a frozen, generic renderer (v0.3.0): the number of items, their order, labels, colours, bands, click actions, thresholds and the poll interval all come from `aiquota`. To change any of them, edit `aiquota` in [tray](https://github.com/go-aiquota/tray), `go install` it, then click the item or run "aiquota: Refresh now" (or wait one poll). No window reload is needed, which matters because a reload restarts the extension host that every extension of the window, Claude Code included, shares; VS Code has no per-extension restart. The settings `warnPercent`, `criticalPercent`, `bands` and `intervalSeconds` are passed to the binary only when you set them; otherwise its defaults rule.
 
 ## Install {#install}
 
