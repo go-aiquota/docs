@@ -17,6 +17,26 @@ Renders one tray item per account (a Stats-style <code>"46%/10%"</code> text dis
 - A credential never touches <code>accounts.json</code> — metadata only, OS keyring for the rest.
 - Testable end-to-end without a mouse: the tray's own state machine is driven by the exact call (<code>MenuItem.Activate()</code>) a real click makes.
 
+## Command line: aiquota and quotaclaim {#cli}
+
+<code>aiquota status [--account A] [-o json|text]</code> loads the Claude plugin and asks **live** for every window (5 h session, weekly, any per-model window), printing used %, the reset time (local, 24 h) and the plan. Exit status: **0** available, **1** exhausted, **3** UNKNOWN (could not read — never reported as available or exhausted), 2 usage error. Every run writes a stamp (time, windows, verdicts, no credential) to <code>os.UserConfigDir()/aiquota/last-status.json</code>.
+
+<code>quotaclaim</code> is a Claude Code <code>Stop</code> / <code>SubagentStop</code> hook that refuses a reply asserting a usage-limit state ("weekly limit", "hit your limit", "resets Nov 12", "limite hebdomadaire", "bloqué jusqu'au") unless a stamp younger than <code>--max-age</code> (default 10 minutes) backs it; it blocks with the reason naming <code>aiquota status</code>. An <code>unknown</code> stamp backs neither "available" nor "exhausted".
+
+```sh
+GOBIN=~/.local/bin go install github.com/go-aiquota/tray/cmd/aiquota@latest
+GOBIN=~/.local/bin go install github.com/go-aiquota/tray/cmd/quotaclaim@latest
+```
+
+Hook configuration (<code>~/.claude/settings.json</code>):
+
+```json
+{"hooks": {
+  "Stop":         [{"hooks": [{"type": "command", "command": "~/.local/bin/quotaclaim"}]}],
+  "SubagentStop": [{"hooks": [{"type": "command", "command": "~/.local/bin/quotaclaim"}]}]
+}}
+```
+
 ## Install {#install}
 
 ```sh
