@@ -17,7 +17,7 @@ VS Code extensions must be JavaScript, so the extension is a thin shell: it runs
 
 ## Changing the look: edit Go, go install, click {#tuning}
 
-The extension is a frozen, generic renderer (v0.3.0): the number of items, their order, labels, colours, bands, click actions, thresholds and the poll interval all come from `aiquota`. To change any of them, edit `aiquota` in [tray](https://github.com/go-aiquota/tray), `go install` it, then click the item or run "aiquota: Refresh now" (or wait one poll). No window reload is needed, which matters because a reload restarts the extension host that every extension of the window, Claude Code included, shares; VS Code has no per-extension restart. The settings `warnPercent`, `criticalPercent`, `bands` and `intervalSeconds` are passed to the binary only when you set them; otherwise its defaults rule.
+The extension is a frozen, generic renderer (v0.3.2 is the latest, installed in a real VS Code by CI): the number of items, their order, labels, colours, bands, click actions, thresholds and the poll interval all come from `aiquota`. To change any of them, edit `aiquota` in [tray](https://github.com/go-aiquota/tray), `go install` it, then click the item or run "aiquota: Refresh now" (or wait one poll). No window reload is needed, which matters because a reload restarts the extension host that every extension of the window, Claude Code included, shares; VS Code has no per-extension restart. The settings `warnPercent`, `criticalPercent`, `bands` and `intervalSeconds` are passed to the binary only when you set them; otherwise its defaults rule.
 
 ## Install {#install}
 
