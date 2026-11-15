@@ -11,6 +11,8 @@ A cross-platform menu-bar app that monitors AI usage quotas across multiple acco
 
 From the terminal, `aiquota status` measures every limit live (exit 0 available, 1 exhausted, 3 unknown), and the `quotaclaim` Claude Code hook refuses a reply that states a usage limit without a fresh measurement — see [tray]({{< relref "repos/tray.md" >}}#cli). In VS Code, the [vscode-statusbar]({{< relref "repos/vscode-statusbar.md" >}}) extension keeps the same usage visible in the status bar (`aiquota status -o statusbar`).
 
+New to it? Start with the [Install]({{< relref "install.md" >}}) page, written for someone who uses VS Code and nothing else.
+
 ## Repositories {#repositories}
 
 <div class="repo-grid" markdown>
